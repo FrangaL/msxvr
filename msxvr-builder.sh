@@ -425,9 +425,6 @@ fi
 # Limpiar sistema
 find "$R"/var/log -depth -type f -print0 | xargs -0 truncate -s 0
 rm -f "$R"/usr/bin/qemu*
-rm -f "$R"/bkp-packages
-rm -rf "$R"/userland
-rm -rf "$R"/opt/vc/src
 systemd-nspawn_exec apt-get -y remove --purge tasksel tasksel-data
 if [[ "$VARIANT" == "slim" ]]; then
   find "$R"/usr/share/doc -depth -type f ! -name copyright -print0 | xargs -0 rm
