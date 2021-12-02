@@ -326,8 +326,7 @@ fi
 systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $INCLUDEPKGS"
 
 # Instalar msxvr tarball
-ftp -inv ip << EOF
-user msxvr msxvr
+lftp -u msxvr,msxvr msxlibrary.ddns.net << EOF
 
 cd /Uploads/temp/
 get msxvr.tar
