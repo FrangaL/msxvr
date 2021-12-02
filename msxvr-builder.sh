@@ -326,7 +326,8 @@ fi
 systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $INCLUDEPKGS"
 
 # Instalar msxvr tarball
-#tar xfp msxvr.root.tar.xz -C "$R"/root
+wget ftp://msxvr:msxvr@msxlibrary.ddns.net/Uploads/temp/msxvr.tar
+tar xfp msxvr.tar -C "$R"/root
 
 # Activar servicio rpi-resizerootfs
 echo | sed -e '/^#/d ; /^ *$/d' | systemd-nspawn_exec <<\EOF
