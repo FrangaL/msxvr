@@ -10,7 +10,7 @@ jobs:
       matrix:
         DISTRO: ["raspios"]
         SUITE: ["buster"]
-        ARCH: ["arm64", "armhf"]
+        ARCH: ["armhf"]
         VARIANT: ["lite"]
     name: msxvr-builder
     steps:
