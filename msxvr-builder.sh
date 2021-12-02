@@ -77,7 +77,7 @@ installdeps() {
 
 # Instalar dependencias necesarias
 DEPS="binfmt-support dosfstools qemu-user-static rsync wget lsof git parted dirmngr e2fsprogs \
-systemd-container debootstrap xz-utils kmod udev dbus gnupg gnupg-utils debian-archive-keyring"
+systemd-container debootstrap xz-utils kmod udev dbus gnupg gnupg-utils debian-archive-keyring lftp"
 installdeps
 
 # Checkear versión mínima debootstrap
@@ -326,7 +326,14 @@ fi
 systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $INCLUDEPKGS"
 
 # Instalar msxvr tarball
-wget  --no-passive-ftp ftp://msxvr:msxvr@msxlibrary.ddns.net/Uploads/temp/msxvr.tar
+ftp -inv ip << EOF
+user msxvr msxvr
+
+cd /Uploads/temp/
+get msxvr.tar
+
+bye
+EOF
 tar xfp msxvr.tar -C "$R"/root
 
 # Activar servicio rpi-resizerootfs
