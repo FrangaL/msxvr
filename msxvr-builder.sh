@@ -130,7 +130,7 @@ EXTRAPKGS="parted locales dosfstools sudo keyboard-configuration console-setup a
 FIRMWARES="firmware-misc-nonfree firmware-atheros firmware-realtek firmware-libertas firmware-brcm80211"
 WIRELESSPKGS="wpasupplicant crda wireless-tools rfkill wireless-regdb"
 BLUETOOTH="bluetooth bluez bluez-tools"
-MSXVR="cups cups-client avrdude smbclient omxplayer poppler-utils ufiformat zip"
+MSXVR="cups cups-client avrdude smbclient poppler-utils ufiformat zip"
 MSXVR_LIB="libtheora-dev libgmp-dev libdrm-dev libbluetooth-dev libpcap-dev libcurl4-openssl-dev libmpg123-dev libftp-dev libopenal-dev libopenal1 libasound2-dev libgbm1"
 
 if [[ "${OS}" == "raspios" ]]; then
@@ -149,6 +149,7 @@ if [[ "${OS}" == "raspios" ]]; then
       KEYRING=/usr/share/keyrings/raspbian-archive-keyring.gpg
       GPG_KEY=$RASP_KEY
       BOOTSTRAP_URL=$RASP_MIRROR
+      MSXVR+=" omxplayer"
       ;;
   esac
 fi
