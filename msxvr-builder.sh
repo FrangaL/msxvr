@@ -92,12 +92,10 @@ case ${ARCHITECTURE} in
   arm64)
     QEMUARCH="qemu-aarch64"
     QEMUBIN="/usr/bin/qemu-aarch64-static"
-    LIB_ARCH="aarch64-linux-gnu"
     ;;
   armhf)
     QEMUARCH="qemu-arm"
     QEMUBIN="/usr/bin/qemu-arm-static"
-    LIB_ARCH="arm-linux-gnueabihf"
     ;;
 esac
 
