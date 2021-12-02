@@ -423,21 +423,16 @@ if [[ "$OS" == "raspios" && "$VARIANT" == "lite" ]]; then
 fi
 
 # Limpiar sistema
-find "$R"/var/log -depth -type f -print0 | xargs -0 truncate -s 0
-rm -f "$R"/usr/bin/qemu*
 systemd-nspawn_exec apt-get -y remove --purge tasksel tasksel-data
+find "$R"/usr/share/doc -empty -print0 | xargs -0 rmdir
 if [[ "$VARIANT" == "slim" ]]; then
   find "$R"/usr/share/doc -depth -type f ! -name copyright -print0 | xargs -0 rm
-  find "$R"/usr/share/doc -empty -print0 | xargs -0 rmdir
   rm -rf "$R"/usr/share/man/* "$R"/usr/share/info/*
   rm -rf "$R"/usr/share/lintian/*
-  rm -rf "$R"/etc/dpkg/dpkg.cfg.d/01_no_doc_locale
 fi
-
-find "$R"/usr/share/doc -empty -print0 | xargs -0 rmdir
+find "$R"/var/log -depth -type f -print0 | xargs -0 truncate -s 0
+rm -f "$R"/usr/bin/qemu*
 rm -rf "$R"/etc/dpkg/dpkg.cfg.d/01_no_doc_locale
-
-echo "nameserver $DNS" >"$R"/etc/resolv.conf
 rm -rf "$R"/etc/apt/apt.conf.d/99_norecommends
 rm -rf "$R"/run/* "$R"/etc/*- "$R"/tmp/*
 rm -rf "$R"/var/lib/apt/lists/*
@@ -447,6 +442,7 @@ rm -rf "$R"/var/cache/debconf/*-old
 rm -rf "$R"/var/lib/dpkg/*-old
 rm -rf "$R"/etc/ssh/ssh_host_*
 rm -rf "$R"/root/.bash_history
+echo "nameserver $DNS" >"$R"/etc/resolv.conf
 
 # Calcule el espacio para crear la imagen.
 ROOTSIZE=$(du -s -B1 "$R" --exclude="${R}"/boot | cut -f1)
