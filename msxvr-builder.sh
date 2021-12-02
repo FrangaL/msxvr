@@ -77,7 +77,7 @@ installdeps() {
 
 # Instalar dependencias necesarias
 DEPS="binfmt-support dosfstools qemu-user-static rsync wget lsof git parted dirmngr e2fsprogs \
-systemd-container debootstrap eatmydata xz-utils kmod udev dbus gnupg gnupg-utils debian-archive-keyring"
+systemd-container debootstrap xz-utils kmod udev dbus gnupg gnupg-utils debian-archive-keyring"
 installdeps
 
 # Checkear versión mínima debootstrap
@@ -127,7 +127,7 @@ systemd-nspawn_exec() {
 
 # Base debootstrap
 COMPONENTS="main contrib non-free"
-MINPKGS="ifupdown openresolv net-tools init dbus rsyslog cron eatmydata wget gnupg libterm-readline-gnu-perl dialog"
+MINPKGS="ifupdown openresolv net-tools init dbus rsyslog cron wget gnupg libterm-readline-gnu-perl dialog"
 EXTRAPKGS="parted locales dosfstools sudo keyboard-configuration console-setup alsa-utils"
 FIRMWARES="firmware-misc-nonfree firmware-atheros firmware-realtek firmware-libertas firmware-brcm80211"
 WIRELESSPKGS="wpasupplicant crda wireless-tools rfkill wireless-regdb"
@@ -164,31 +164,9 @@ if [ ! -f $KEYRING ]; then
 fi
 
 # First stage
-eatmydata debootstrap --foreign --arch="${ARCHITECTURE}" --components="${COMPONENTS// /,}" \
+debootstrap --foreign --arch="${ARCHITECTURE}" --components="${COMPONENTS// /,}" \
   --keyring=$KEYRING --variant - --include="${MINPKGS// /,}" "$RELEASE" "$R" $BOOTSTRAP_URL
 
-for archive in "$R"/var/cache/apt/archives/*eatmydata*.deb; do
-  dpkg-deb --fsys-tarfile "$archive" >"$R"/eatmydata
-  tar -xkf "$R"/eatmydata -C "$R"
-  rm -f "$R"/eatmydata
-done
-
-systemd-nspawn_exec dpkg-divert --divert /usr/bin/dpkg-eatmydata --rename --add /usr/bin/dpkg
-
-cat >"$R"/usr/bin/dpkg <<EOF
-#!/bin/sh
-if [ -e /usr/lib/${LIB_ARCH}/libeatmydata.so ]; then
-    [ -n "\${LD_PRELOAD}" ] && LD_PRELOAD="\$LD_PRELOAD:"
-    LD_PRELOAD="\$LD_PRELOAD\$so"
-fi
-for so in /usr/lib/${LIB_ARCH}/libeatmydata.so; do
-    [ -n "\$LD_PRELOAD" ] && LD_PRELOAD="\$LD_PRELOAD:"
-    LD_PRELOAD="\$LD_PRELOAD\$so"
-done
-export LD_PRELOAD
-exec "\$0-eatmydata" --force-unsafe-io "\$@"
-EOF
-chmod 755 "$R"/usr/bin/dpkg
 
 #cat >"$R"/etc/apt/apt.conf.d/99_norecommends <<EOF
 #APT::Install-Recommends "false";
@@ -220,7 +198,7 @@ EOF
 fi
 
 # Second stage
-systemd-nspawn_exec eatmydata /debootstrap/debootstrap --second-stage
+systemd-nspawn_exec /debootstrap/debootstrap --second-stage
 
 # Definir sources.list
 if [ "$OS" = "raspios" ]; then
@@ -318,9 +296,9 @@ fi
 EOF
 
 # Instalando kernel
-systemd-nspawn_exec eatmydata apt-get update
+systemd-nspawn_exec apt-get update
 # shellcheck disable=SC2086
-systemd-nspawn_exec eatmydata apt-get install -y ${KERNEL_IMAGE}
+systemd-nspawn_exec apt-get install -y ${KERNEL_IMAGE}
 # Configuración firmware
 if [ "$OS" = raspios ]; then
   cat <<-EOM >"${R}"${BOOT}/cmdline.txt
@@ -345,7 +323,7 @@ if [ -n "$MSXVR" ]; then
 fi
 
 # Instalar paquetes extra
-systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive eatmydata apt-get install -y $INCLUDEPKGS"
+systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $INCLUDEPKGS"
 
 # Instalar msxvr tarball
 wget https://muriana.pro/msxvr.root.tar.xz
@@ -447,14 +425,12 @@ if [[ "$OS" == "raspios" && "$VARIANT" == "lite" ]]; then
 fi
 
 # Limpiar sistema
-rm -f "$R"/usr/bin/dpkg
-systemd-nspawn_exec dpkg-divert --remove --rename /usr/bin/dpkg
 find "$R"/var/log -depth -type f -print0 | xargs -0 truncate -s 0
 rm -f "$R"/usr/bin/qemu*
 rm -f "$R"/bkp-packages
 rm -rf "$R"/userland
 rm -rf "$R"/opt/vc/src
-systemd-nspawn_exec apt-get -y remove --purge tasksel tasksel-data eatmydata libeatmydata1
+systemd-nspawn_exec apt-get -y remove --purge tasksel tasksel-data
 if [[ "$VARIANT" == "slim" ]]; then
   find "$R"/usr/share/doc -depth -type f ! -name copyright -print0 | xargs -0 rm
   find "$R"/usr/share/doc -empty -print0 | xargs -0 rmdir
