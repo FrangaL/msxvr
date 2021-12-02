@@ -243,7 +243,8 @@ cat >"$R"/usr/sbin/rpi-resizerootfs <<\EOM
 #!/bin/sh
 DISKPART="$(findmnt -n -o SOURCE /)"
 DISKNAME="/dev/$(lsblk -no pkname "$DISKPART")"
-flock ${DISKNAME} sfdisk -f ${DISKNAME} -N ${DISKPART##*[!0-9]} <<EOF
+DISKNAMENR="$(blkid -sPART_ENTRY_NUMBER -o value -p $DISKNAME)"
+flock ${DISKNAME} sfdisk -f ${DISKNAME} -N $DISKNAMENR <<EOF
 ,+
 EOF
 
