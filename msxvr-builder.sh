@@ -199,20 +199,13 @@ fi
 systemd-nspawn_exec /debootstrap/debootstrap --second-stage
 
 # Definir sources.list
-if [ "$OS" = "raspios" ]; then
-  if [ "$ARCHITECTURE" = "arm64" ]; then
-    echo "deb $DEB_MIRROR $RELEASE $COMPONENTS" >"$R"/etc/apt/sources.list
-    echo "#deb-src $DEB_MIRROR $RELEASE $COMPONENTS" >>"$R"/etc/apt/sources.list
-    echo "deb ${MIRROR_PIOS/raspbian/debian} $RELEASE main" >"$R"/etc/apt/sources.list.d/raspi.list
-    echo "#deb-src ${MIRROR_PIOS/raspbian/debian} $RELEASE main" >>"$R"/etc/apt/sources.list.d/raspi.list
-  elif [ "$ARCHITECTURE" = "armhf" ]; then
-    echo "deb $MIRROR $RELEASE $COMPONENTS" >"$R"/etc/apt/sources.list
-    echo "#deb-src $MIRROR $RELEASE $COMPONENTS" >>"$R"/etc/apt/sources.list
-    MIRROR=${PIOS_MIRROR/raspbian./archive.}
-    echo "deb ${MIRROR/raspbian/debian} $RELEASE main" >"$R"/etc/apt/sources.list.d/raspi.list
-    echo "#deb-src ${MIRROR/raspbian/debian} $RELEASE main" >>"$R"/etc/apt/sources.list.d/raspi.list
-  fi
-fi
+case ${OS}+${ARCHITECTURE} in
+  raspios*arm64)
+  echo "deb ${MIRROR_PIOS/raspbian/debian} $RELEASE main" >"$R"/etc/apt/sources.list.d/raspi.list ;;
+  raspios*armhf)
+  MIRROR=${PIOS_MIRROR/raspbian./archive.}
+  echo "deb ${MIRROR/raspbian/debian} $RELEASE main" >"$R"/etc/apt/sources.list.d/raspi.list ;;
+esac
 
 # Instalar archive-keyring en PiOS
 if [ "$OS" = "raspios" ]; then
