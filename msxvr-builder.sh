@@ -419,7 +419,7 @@ EOF
 
 # Raspberry PI userland tools
 if [[ "$OS" == "raspios" && "$VARIANT" == "lite" ]]; then
-  systemd-nspawn_exec apt-get install -y libraspberrypi-bin
+  systemd-nspawn_exec apt-get install -y libraspberrypi-bin raspi-config
 fi
 
 # Limpiar sistema
