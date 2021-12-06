@@ -327,8 +327,10 @@ if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
 #!/bin/bash -e
 dpkg --get-selections > /bkp-packages
 cd /omxplayer
+wget http://ftp.us.debian.org/debian/pool/main/libv/libva/libva1_1.7.3-2_armhf.deb
+dpkg -i libva1_1.7.3-2_armhf.deb || apt-get install -f -y
 apt-get update
-apt-get install -y git-core binutils libva1 libpcre3-dev libidn11-dev libboost-dev \
+apt-get install -y git-core binutils libpcre3-dev libidn11-dev libboost-dev \
   libfreetype6-dev libssl1.0-dev libssh-dev libsmbclient-dev gcc g++
 make ffmpeg
 make -j$(nproc)
@@ -342,15 +344,16 @@ EOF
 chmod +x "$R"/omxplayer_compile.sh
 systemd-nspawn_exec /omxplayer_compile.sh
 fi
+
 # Instalar msxvr tarball
-lftp -u msxvr,msxvr msxlibrary.ddns.net << EOF
-
-cd /Uploads/temp/
-get msxvr.tar
-
-bye
-EOF
-tar xfp msxvr.tar -C "$R"/root
+#lftp -u msxvr,msxvr msxlibrary.ddns.net << EOF
+#
+#cd /Uploads/temp/
+#get msxvr.tar
+#
+#bye
+#EOF
+#tar xfp msxvr.tar -C "$R"/root
 
 # Activar servicio redimendionado partición root
 systemd-nspawn_exec systemctl enable rpi-resizerootfs.service
