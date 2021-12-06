@@ -329,7 +329,7 @@ dpkg --set-selections < /bkp-packages
 apt-get -y dselect-upgrade
 apt-get -y remove --purge \$(dpkg -l | grep "^rc" | awk '{print \$2}')
 EOF
-chmod +x "$R"/omxplayer_compile.shh
+chmod +x "$R"/omxplayer_compile.sh
 systemd-nspawn_exec /omxplayer_compile.sh
 fi
 # Instalar msxvr tarball
