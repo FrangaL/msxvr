@@ -313,6 +313,25 @@ fi
 # Instalar paquetes extra
 systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $INCLUDEPKGS"
 
+if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
+  git clone https://github.com/popcornmix/omxplayer.git "$R"/omxplayer
+  cat <<EOF >"$R"/omxplayer_compile.sh
+#!/bin/bash -e
+dpkg --get-selections > /bkp-packages
+cd /omxplayer
+./prepare-native-raspbian.sh
+make ffmpeg
+make -j$(nproc)
+make install
+# Limpiar el sistema de paquetes innecesarios.
+dpkg --clear-selections
+dpkg --set-selections < /bkp-packages
+apt-get -y dselect-upgrade
+apt-get -y remove --purge \$(dpkg -l | grep "^rc" | awk '{print \$2}')
+EOF
+chmod +x "$R"omxplayer_compile.shh
+systemd-nspawn_exec omxplayer_compile.sh
+fi
 # Instalar msxvr tarball
 lftp -u msxvr,msxvr msxlibrary.ddns.net << EOF
 
