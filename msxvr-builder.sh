@@ -435,6 +435,12 @@ rm -rf "$R"/var/cache/debconf/*-old
 rm -rf "$R"/var/lib/dpkg/*-old
 rm -rf "$R"/etc/ssh/ssh_host_*
 rm -rf "$R"/root/.bash_history
+# Crear manifiesto
+if [[ "$MANIFEST" == "true" ]]; then
+  systemd-nspawn_exec sh -c "dpkg-query -f '\${Package} \${Version}\n' -W > /${IMGNAME}.manifest"
+  cp $R/$IMGNAME.manifest $IMGNAME.manifest
+  rm -f $R/$IMGNAME.manifest
+fi
 echo "nameserver $DNS" >"$R"/etc/resolv.conf
 
 # Calcule el espacio para crear la imagen.
