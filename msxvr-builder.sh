@@ -331,7 +331,7 @@ wget http://ftp.us.debian.org/debian/pool/main/libv/libva/libva1_1.7.3-2_armhf.d
 dpkg -i libva1_1.7.3-2_armhf.deb || apt-get install -f -y
 apt-get update
 apt-get install -y git-core binutils libpcre3-dev libidn11-dev libboost-dev \
-  libfreetype6-dev libssl-dev libssh-dev libsmbclient-dev gcc g++
+  libfreetype6-dev libssl-dev libssh-dev libsmbclient-dev gcc g++ make
 make ffmpeg
 make -j$(nproc)
 make install
