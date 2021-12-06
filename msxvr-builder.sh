@@ -63,6 +63,14 @@ else
   mkdir -p "$R"
 fi
 
+# Show progress
+status() {
+  status_i=$((status_i+1))
+  echo -e "\e[32m ✅ ${status_i}/${status_t}:\033[0m $1"
+}
+status_i=0
+status_t=$(($(grep '.*status ' $0 | wc -l) -1))
+
 # Función para instalar dependencias del script
 installdeps() {
   [[ $APT_UPDATE == "0" ]] && apt-get update; APT_UPDATE="1"
@@ -70,7 +78,7 @@ installdeps() {
       -o dpkg::options::=--force-confnew -o Acquire::Retries=3 $DEPS
 }
 
-# Instalar dependencias necesarias
+status "Instalar dependencias ..."
 DEPS="binfmt-support dosfstools qemu-user-static rsync wget lsof git parted dirmngr e2fsprogs \
 systemd-container debootstrap xz-utils kmod udev dbus gnupg gnupg-utils debian-archive-keyring lftp"
 installdeps
@@ -149,7 +157,7 @@ if [[ "${OS}" == "raspios" ]]; then
   esac
 fi
 
-# Instalar certificados
+status "Instalardo certificados ..."
 if [ ! -f $KEYRING ]; then
   GNUPGHOME="$(mktemp -d)"
   export GNUPGHOME
@@ -157,7 +165,7 @@ if [ ! -f $KEYRING ]; then
   rm -rf "${GNUPGHOME}"
 fi
 
-# First stage
+status "debootstrap first stage"
 debootstrap --foreign --arch="${ARCHITECTURE}" --components="${COMPONENTS// /,}" \
   --keyring=$KEYRING --variant - --include="${MINPKGS// /,}" "$RELEASE" "$R" $BOOTSTRAP_URL
 
@@ -191,7 +199,7 @@ path-exclude=/lib/udev/hwdb.d/20-acpi*
 EOF
 fi
 
-# Second stage
+status "debootstrap second stage"
 systemd-nspawn_exec /debootstrap/debootstrap --second-stage
 
 # Definir sources.list
@@ -246,7 +254,7 @@ resize2fs ${DISKPART}
 EOM
 chmod -c 755 "$R"/usr/sbin/rpi-resizerootfs
 
-# Configurar usuarios, grupos
+status "Configurar usuarios y grupos"
 systemd-nspawn_exec <<_EOF
 adduser --gecos pi --disabled-password pi
 echo "pi:${ROOT_PASSWORD}" | chpasswd
@@ -310,7 +318,7 @@ if [ -n "$MSXVR" ]; then
   INCLUDEPKGS="${MSXVR} ${MSXVR_LIB} ${INCLUDEPKGS}"
 fi
 
-# Instalar paquetes extra
+status "Instalar paquetes extra"
 systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $INCLUDEPKGS"
 
 if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
@@ -319,7 +327,9 @@ if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
 #!/bin/bash -e
 dpkg --get-selections > /bkp-packages
 cd /omxplayer
-sudo ./prepare-native-raspbian.sh
+apt-get update
+apt-get install -y git-core binutils libva1 libpcre3-dev libidn11-dev libboost-dev \
+  libfreetype6-dev libssl1.0-dev libssh-dev libsmbclient-dev gcc g++
 make ffmpeg
 make -j$(nproc)
 make install
@@ -355,7 +365,7 @@ systemd-nspawn_exec dpkg-reconfigure -fnoninteractive tzdata
 # Sin contraseña sudo en el usuario pi
 echo "pi ALL=(ALL) NOPASSWD:ALL" >>"$R"/etc/sudoers
 
-# Configurar locales
+status "Configurar locales"
 sed -i "s/^# *\($LOCALES\)/\1/" "$R"/etc/locale.gen
 systemd-nspawn_exec locale-gen
 echo "LANG=$LOCALES" >"$R"/etc/locale.conf
@@ -429,12 +439,12 @@ systemctl disable console-setup.service
 systemctl disable keyboard-setup.service
 EOF
 
-# Raspberry PI userland tools
+# Raspberry PI userland tools & raspi-config
 if [[ "$OS" == "raspios" && "$VARIANT" == "lite" ]]; then
   systemd-nspawn_exec apt-get install -y libraspberrypi-bin raspi-config
 fi
 
-# Limpiar sistema
+status "Limpiar sistema"
 systemd-nspawn_exec apt-get -y remove --purge tasksel tasksel-data
 find "$R"/usr/share/doc -empty -print0 | xargs -0 rmdir
 if [[ "$VARIANT" == "slim" ]]; then
@@ -462,12 +472,12 @@ if [[ "$MANIFEST" == "true" ]]; then
 fi
 echo "nameserver $DNS" >"$R"/etc/resolv.conf
 
-# Calcule el espacio para crear la imagen.
+status "Calcule el espacio para crear la imagen"
 ROOTSIZE=$(du -s -B1 "$R" --exclude="${R}"/boot | cut -f1)
 ROOTSIZE=$((ROOTSIZE * 5 * 1024 / 5 / 1000 / 1024))
 RAW_SIZE=$(($((FREE_SPACE * 1024)) + ROOTSIZE + $((BOOT_MB * 1024)) + 4096))
 
-# Crea el disco y particionar
+status "Crea el disco y particionar"
 fallocate -l "$(echo ${RAW_SIZE}Ki | numfmt --from=iec-i --to=si)" "${IMGNAME}"
 parted -s "${IMGNAME}" mklabel msdos
 parted -s "${IMGNAME}" mkpart primary fat32 1MiB $((BOOT_MB + 1))MiB
@@ -478,7 +488,7 @@ LOOPDEVICE=$(losetup --show -fP "${IMGNAME}")
 BOOT_LOOP="${LOOPDEVICE}p1"
 ROOT_LOOP="${LOOPDEVICE}p2"
 
-# Formatear particiones
+status "Formatear particiones"
 mkfs.vfat -n BOOT -F 32 -v "$BOOT_LOOP"
 if [[ $FSTYPE == f2fs ]]; then
   mkfs.f2fs -f -l ROOTFS "$ROOT_LOOP"
@@ -488,14 +498,14 @@ elif [[ $FSTYPE == ext4 ]]; then
   mkfs $FEATURES -t "$FSTYPE" -L ROOTFS "$ROOT_LOOP"
 fi
 
-# Crear los directorios para las particiones y montarlas
+status "Crear los directorios para las particiones y montarlas"
 MOUNTDIR="$BUILDDIR/mount"
-mkdir -p "$MOUNTDIR"
-mount "$ROOT_LOOP" "$MOUNTDIR"
-mkdir -p "$MOUNTDIR/$BOOT"
-mount "$BOOT_LOOP" "$MOUNTDIR/$BOOT"
+mkdir -v -p "$MOUNTDIR"
+mount -v "$ROOT_LOOP" "$MOUNTDIR"
+mkdir -v -p "$MOUNTDIR/$BOOT"
+mount -v "$BOOT_LOOP" "$MOUNTDIR/$BOOT"
 
-# Rsyncing rootfs en archivo de imagen
+status "Rsyncing rootfs en archivo de imagen"
 rsync -aHAXx --exclude boot "${R}/" "${MOUNTDIR}/"
 rsync -rtx "${R}/boot" "${MOUNTDIR}/"
 
@@ -504,7 +514,7 @@ umount "$MOUNTDIR/$BOOT"
 umount "$MOUNTDIR"
 rm -rf "$BASEDIR"
 
-# Chequear particiones
+status "Chequear particiones"
 dosfsck -w -r -a -t "$BOOT_LOOP"
 if [[ "$FSTYPE" == "f2fs" ]]; then
   fsck.f2fs -y -f "$ROOT_LOOP"
@@ -515,7 +525,7 @@ fi
 # Eliminar dispositivos loop
 losetup -d "${LOOPDEVICE}"
 
-# Comprimir imagen
+status "Comprimiendo imagen ..."
 if [[ "$COMPRESS" == "gzip" ]]; then
   gzip "${IMGNAME}"
   chmod 664 "${IMGNAME}.gz"
