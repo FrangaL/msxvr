@@ -144,7 +144,7 @@ if [[ "${OS}" == "raspios" ]]; then
       KEYRING=/usr/share/keyrings/raspbian-archive-keyring.gpg
       GPG_KEY=$RASP_KEY
       BOOTSTRAP_URL=$RASP_MIRROR
-      MSXVR+=" omxplayer"
+      [[ "$RELEASE" == "buster" ]] && MSXVR+=" omxplayer"
       ;;
   esac
 fi
