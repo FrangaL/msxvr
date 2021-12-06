@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         DISTRO: ["raspios"]
-        SUITE: ["buster"]
+        SUITE: ["buster", "bullseye"]
         ARCH: ["armhf"]
         VARIANT: ["lite"]
     name: msxvr-builder
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build images
         run: |
-              sudo ARCHITECTURE=${{ matrix.ARCH }} ./msxvr-builder.sh
+              sudo MANIFEST=true RELEASE=${{ matrix.SUITE }} ARCHITECTURE=${{ matrix.ARCH }} ./msxvr-builder.sh
               sha256sum ${{ matrix.DISTRO }}-${{ matrix.SUITE }}-${{ matrix.VARIANT }}-${{ matrix.ARCH }}.img.xz \
                 > ${{ matrix.DISTRO }}-${{ matrix.SUITE }}-${{ matrix.VARIANT }}-${{ matrix.ARCH }}.img.sha256
       - name: Publish Release
