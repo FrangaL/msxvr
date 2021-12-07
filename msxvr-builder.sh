@@ -329,7 +329,7 @@ cd /omxplayer
 wget http://ftp.us.debian.org/debian/pool/main/libv/libva/libva1_1.7.3-2_armhf.deb
 dpkg -i libva1_1.7.3-2_armhf.deb || apt-get install -f -y
 apt-get update
-apt-get install -y git-core binutils libpcre3-dev libidn11-dev libboost-dev \
+apt-get install -y git-core binutils libpcre3-dev libidn11-dev libboost-dev libomxil-bellagio-dev \
   libfreetype6-dev libssl-dev libssh-dev libsmbclient-dev gcc g++ make libraspberrypi-dev
 make ffmpeg
 make -j$(nproc)
