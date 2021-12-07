@@ -323,27 +323,11 @@ status "Instalar paquetes extra"
 systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $INCLUDEPKGS"
 
 if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
-  git clone https://github.com/popcornmix/omxplayer.git "$R"/omxplayer
-  cat <<EOF >"$R"/omxplayer_compile.sh
-#!/bin/bash -e
-dpkg --get-selections > /bkp-packages
-cd /omxplayer
-wget http://ftp.us.debian.org/debian/pool/main/libv/libva/libva1_1.7.3-2_armhf.deb
-dpkg -i libva1_1.7.3-2_armhf.deb || apt-get install -f -y
-apt-get update
-apt-get install -y git-core binutils libpcre3-dev libidn11-dev libboost-dev libomxil-bellagio-dev \
-  libfreetype6-dev libssl-dev libssh-dev libsmbclient-dev gcc g++ make libraspberrypi-dev
-make ffmpeg
-make -j$(nproc)
-make install
-# Limpiar el sistema de paquetes innecesarios.
-dpkg --clear-selections
-dpkg --set-selections < /bkp-packages
-apt-get -y dselect-upgrade
-apt-get -y remove --purge \$(dpkg -l | grep "^rc" | awk '{print \$2}')
-EOF
-chmod +x "$R"/omxplayer_compile.sh
-systemd-nspawn_exec /omxplayer_compile.sh
+  wget https://archive.raspberrypi.org/debian/pool/main/o/omxplayer/omxplayer_20190723+gitf543a0d-1_armhf.deb
+  cp omxplayer_20190723+gitf543a0d-1_armhf.deb "$R"/omxplayer_20190723+gitf543a0d-1_armhf.deb
+  systemd-nspawn_exec dpkg -i /omxplayer_20190723+gitf543a0d-1_armhf.deb
+  systemd-nspawn_exec apt-get install -f -y
+  rm -f "$R"/omxplayer_20190723+gitf543a0d-1_armhf.deb
 fi
 
 # Instalar msxvr tarball
