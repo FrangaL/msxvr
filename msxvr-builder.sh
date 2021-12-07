@@ -165,8 +165,10 @@ if [ ! -f $KEYRING ]; then
 fi
 
 status "debootstrap first stage"
-debootstrap --foreign --arch="${ARCHITECTURE}" --components="${COMPONENTS// /,}" \
-  --keyring=$KEYRING --variant - --include="${MINPKGS// /,}" "$RELEASE" "$R" $BOOTSTRAP_URL
+sed -i'.bkp' 's/^keyring/keyring $KEYRING\ndefault_mirror $BOOTSTRAP_URL\n#/' /usr/share/debootstrap/scripts/sid
+debootstrap --foreign --arch="${ARCHITECTURE}" --components="${COMPONENTS// /,}" --variant - \
+  --keyring=$KEYRING --exclude="info,install-info" --include="${MINPKGS// /,}" "$RELEASE" "$R" $BOOTSTRAP_URL
+mv /usr/share/debootstrap/scripts/sid{.bkp,}
 
 
 #cat >"$R"/etc/apt/apt.conf.d/99_norecommends <<EOF
