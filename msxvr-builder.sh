@@ -152,7 +152,6 @@ if [[ "${OS}" == "raspios" ]]; then
       KEYRING=/usr/share/keyrings/raspbian-archive-keyring.gpg
       GPG_KEY=$RASP_KEY
       BOOTSTRAP_URL=$RASP_MIRROR
-      [[ "$RELEASE" == "buster" ]] && MINPKGS+=" raspbian-archive-keyring";MSXVR+=" omxplayer"
       ;;
   esac
 fi
@@ -214,6 +213,7 @@ esac
 # Instalar archive-keyring en PiOS
 if [ "$OS" = "raspios" ]; then
   [[ "$RELEASE" == "buster" ]] && cp "$KEYRING" "$R"/etc/apt/trusted.gpg.d
+  [[ "$RELEASE" == "buster" ]] && MSXVR+=" omxplayer"
   systemd-nspawn_exec apt-key adv --keyserver-options timeout=10 --keyserver $KEY_SRV --recv-keys $PIOS_KEY
   #apt-key adv --keyserver-options timeout=10 --keyserver $KEY_SRV --recv-keys $RASP_KEY
 fi
