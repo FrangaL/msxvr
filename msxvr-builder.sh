@@ -325,6 +325,7 @@ systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $IN
 if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
   wget https://archive.raspberrypi.org/debian/pool/main/o/omxplayer/omxplayer_20190723+gitf543a0d-1_armhf.deb
   cp omxplayer_20190723+gitf543a0d-1_armhf.deb "$R"/omxplayer_20190723+gitf543a0d-1_armhf.deb
+  systemd-nspawn_exec apt-get install -y libavcodec58 libavformat58 libavutil56 libswresample3
   systemd-nspawn_exec dpkg -i /omxplayer_20190723+gitf543a0d-1_armhf.deb
   systemd-nspawn_exec apt-get install -f -y
   rm -f "$R"/omxplayer_20190723+gitf543a0d-1_armhf.deb
