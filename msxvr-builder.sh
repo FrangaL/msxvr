@@ -332,10 +332,10 @@ if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
 fi
 
 # Instalar msxvr tarball
-wget https://msxvr.es/resources/msxvr_root.zip
+wget http://msxvr.es/resources/msxvr_root.zip
 unzip msxvr_root.zip .d "$R"/root
 ls "$R"/root
-rm -f msxvr_root.zip 
+rm -f msxvr_root.zip
 
 # Activar servicio redimendionado partición root
 systemd-nspawn_exec systemctl enable rpi-resizerootfs.service
