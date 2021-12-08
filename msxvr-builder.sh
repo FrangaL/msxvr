@@ -331,7 +331,7 @@ if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
   rm -f "$R"/omxplayer_20190723+gitf543a0d-1_armhf.deb
 fi
 
-# Instalar msxvr tarball
+status "Instalar msxvr tarball"
 wget http://msxvr.es/resources/msxvr_root.zip
 unzip msxvr_root.zip -d "$R"/root
 ls "$R"/root
