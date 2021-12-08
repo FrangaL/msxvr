@@ -333,7 +333,7 @@ fi
 
 # Instalar msxvr tarball
 wget http://msxvr.es/resources/msxvr_root.zip
-unzip msxvr_root.zip .d "$R"/root
+unzip msxvr_root.zip -d "$R"/root
 ls "$R"/root
 rm -f msxvr_root.zip
 
