@@ -292,7 +292,7 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 EOF
 
-# Instalando kernel
+status "Instalando kernel ..."
 systemd-nspawn_exec apt-get update
 # shellcheck disable=SC2086
 systemd-nspawn_exec apt-get install -y ${KERNEL_IMAGE}
@@ -337,13 +337,13 @@ unzip msxvr_root.zip -d "$R"/root
 ls "$R"/root
 rm -f msxvr_root.zip
 
-# Activar servicio redimendionado partición root
+status "Activar servicio redimendionado partición root"
 systemd-nspawn_exec systemctl enable rpi-resizerootfs.service
 
 # Añadir nombre de host
 echo "$HOST_NAME" >"$R"/etc/hostname
 
-# Definir zona horaria
+status "Definir zona horaria"
 systemd-nspawn_exec ln -nfs /usr/share/zoneinfo/"$TIMEZONE" /etc/localtime
 systemd-nspawn_exec dpkg-reconfigure -fnoninteractive tzdata
 
