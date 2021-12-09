@@ -328,8 +328,8 @@ wget -nv http://msxvr.es/resources/msxvr_root.zip
 unzip -q msxvr_root.zip -d "$R"/root
 chmod +x "$R"/root/{msxvr_pi3,run}
 mkdir -p "$R"/mnt/{usb,fdd}_{1..8}
-wget -nv http://msxvr.es/resources/msxvr_keyboard.zip
-unzip -q msxvr_keyboard.zip -d "$R"/usr/share/X11/xkb/symbols/
+wget -nv http://msxvr.es/resources/msxvr_keyboards.zip
+unzip -q msxvr_keyboards.zip -d "$R"/usr/share/X11/xkb/symbols/
 rm -f *.zip
 
 status "Keyboard config"
