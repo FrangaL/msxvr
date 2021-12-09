@@ -335,6 +335,7 @@ status "Instalar msxvr tarball"
 wget -nv http://msxvr.es/resources/msxvr_root.zip
 unzip -q msxvr_root.zip -d "$R"/root
 rm -f msxvr_root.zip
+chmod +x "$R"/root/{msxvr_pi3,run}
 mkdir -p "$R"/mnt/{usb,fdd}_{1..8}
 
 status "Activar servicio redimendionado partición root"
