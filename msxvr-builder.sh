@@ -277,16 +277,6 @@ ExecStart=
 ExecStart=-/sbin/agetty --skip-login --noclear --noissue --login-options "-f root" %I $TERM
 EOF
 
-# Keyboard config
-cat > "$R"/etc/default/keyboard << EOF
-XKBMODEL="pc105"
-XKBLAYOUT=es
-XKBVARIANT=""
-XKBOPTIONS=""
-
-BACKSPACE="guess"
-EOF
-
 # Auto run MSXVR
 cat > "$R"/etc/profile.d/msxvr.sh << 'EOF'
 if [ "$(id -u)" -eq 0 ]; then
@@ -341,6 +331,17 @@ mkdir -p "$R"/mnt/{usb,fdd}_{1..8}
 wget -nv http://msxvr.es/resources/msxvr_keyboard.zip
 unzip -q msxvr_keyboard.zip -d "$R"/usr/share/X11/xkb/symbols/
 rm -f *.zip
+
+status "Keyboard config"
+cat > "$R"/etc/default/keyboard << EOF
+XKBMODEL="pc105"
+XKBLAYOUT=" + string(_iso) + "
+XKBVARIANT=""
+XKBOPTIONS=""
+
+BACKSPACE="guess"
+EOF
+systemd-nspawn_exec setupcon
 
 status "Activar servicio redimendionado partición root"
 systemd-nspawn_exec systemctl enable rpi-resizerootfs.service
