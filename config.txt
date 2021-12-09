@@ -3,7 +3,7 @@
 # Some settings may impact device functionality. See link above for details
 
 # uncomment if you get no picture on HDMI for a default "safe" mode
-#hdmi_safe=1
+hdmi_safe=1
 
 # uncomment this if your display has a black border of unused pixels visible
 # and your display can output without overscan
@@ -18,11 +18,11 @@
 
 # uncomment to force a HDMI mode rather than DVI. This can make audio work in
 # DMT (computer monitor) modes
-#hdmi_drive=2
+hdmi_drive=2
 
 # uncomment to increase signal to HDMI, if you have interference, blanking, or
 # no display
-config_hdmi_boost=6
+config_hdmi_boost=5
 
 # uncomment for composite PAL
 #sdtv_mode=0
@@ -56,24 +56,24 @@ hdmi_mode:1=9
 enable_tvout=0
 
 [all]
-framebuffer_width=800
-framebuffer_height=600
+framebuffer_width=640
+framebuffer_height=480
 #hdmi_force_hotplug=1
 #hdmi_ignore_hotplug=1
 hdmi_group=2
-hdmi_mode=9
+hdmi_mode=4
 i2c_arm_baudrate=700000
 enable_uart=0
 disable_splash=1
-gpu_mem=512
-gpu_mem_1024=512
+gpu_mem=256
+gpu_mem_1024=256
 hdmi_force_edid_audio=1
 disable_audio_dither=1
 dtoverlay=disable-bt
 dtoverlay=disable-wifi
-dtparam=act_led_trigger=none
-dtparam=act_led_activelow=off
+#dtparam=act_led_trigger=none
+#dtparam=act_led_activelow=off
 #dtparam=pwr_led_trigger=none
 #dtparam=pwr_led_activelow=off
-initial_turbo=20
-#boot_delay=0
+#initial_turbo=60
+boot_delay_ms=0
