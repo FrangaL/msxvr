@@ -176,8 +176,10 @@ mv /usr/share/debootstrap/scripts/sid{.bkp,}
 #APT::AutoRemove::RecommendsImportant "false";
 #APT::AutoRemove::SuggestsImportant "false";
 #EOF
-
 if [[ "${VARIANT}" == "lite" ]]; then
+  cat >"$R"/etc/dpkg/dpkg.cfg.d/02_keyboard <<EOF
+path-exclude /usr/share/X11/xkb/symbols/*
+EOF
   cat >"$R"/etc/dpkg/dpkg.cfg.d/01_no_doc_locale <<EOF
 path-exclude /usr/lib/systemd/catalog/*
 path-exclude /usr/share/doc/*
@@ -334,9 +336,11 @@ fi
 status "Instalar msxvr tarball"
 wget -nv http://msxvr.es/resources/msxvr_root.zip
 unzip -q msxvr_root.zip -d "$R"/root
-rm -f msxvr_root.zip
 chmod +x "$R"/root/{msxvr_pi3,run}
 mkdir -p "$R"/mnt/{usb,fdd}_{1..8}
+wget -nv http://msxvr.es/resources/msxvr_keyboard.zip
+unzip -q msxvr_keyboard.zip -d "$R"/usr/share/X11/xkb/symbols/
+rm -f *.zip
 
 status "Activar servicio redimendionado partición root"
 systemd-nspawn_exec systemctl enable rpi-resizerootfs.service
