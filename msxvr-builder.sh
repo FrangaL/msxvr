@@ -332,9 +332,8 @@ if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
 fi
 
 status "Instalar msxvr tarball"
-wget http://msxvr.es/resources/msxvr_root.zip
-unzip msxvr_root.zip -d "$R"/root
-ls "$R"/root
+wget -nv http://msxvr.es/resources/msxvr_root.zip
+unzip -q msxvr_root.zip -d "$R"/root
 rm -f msxvr_root.zip
 
 status "Activar servicio redimendionado partición root"
