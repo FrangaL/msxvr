@@ -431,6 +431,8 @@ systemctl disable remote-fs.target
 systemctl disable console-setup.service
 systemctl disable keyboard-setup.service
 EOF
+# Fix startup time from 5 minutes to 10 secs on raise interface
+sed -i 's/^TimeoutStartSec=5min/TimeoutStartSec=10/g' "$R/usr/lib/systemd/system/networking.service"
 
 # Raspberry PI userland tools & raspi-config
 if [[ "$OS" == "raspios" && "$VARIANT" == "lite" ]]; then
