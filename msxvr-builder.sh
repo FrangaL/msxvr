@@ -17,7 +17,7 @@ fi
 OS=${OS:-"raspios"}
 RELEASE=${RELEASE:-"buster"}
 ROOT_PASSWORD=${ROOT_PASSWORD:-"raspberry"}
-HOST_NAME=${HOST_NAME:-"rpi"}
+HOST_NAME=${HOST_NAME:-"msxvr"}
 COMPRESS=${COMPRESS:-"xz"}
 LOCALES=${LOCALES:-"es_ES.UTF-8"}
 TIMEZONE=${TIMEZONE:-"Europe/Madrid"}
