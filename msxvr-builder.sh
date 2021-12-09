@@ -408,7 +408,7 @@ allow-hotplug eth0
 iface eth0 inet dhcp
 EOF
 
-# Deshabilitar servicios innecesarios
+status "Deshabilitar servicios innecesarios"
 echo | sed -e '/^#/d ; /^ *$/d' | systemd-nspawn_exec <<\EOF
 # Servicio cron
 systemctl disable cron.service
