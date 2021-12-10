@@ -330,6 +330,7 @@ chmod +x "$R"/root/{msxvr_pi3,run}
 mkdir -p "$R"/mnt/{usb,fdd}_{1..8}
 wget -nv http://msxvr.es/resources/msxvr_keyboards.zip
 unzip -q msxvr_keyboards.zip -d "$R"/usr/share/X11/xkb/symbols/
+systemd-nspawn_exec dpkg-reconfigure xkb-data
 rm -f *.zip
 wget -nv https://yt-dl.org/downloads/latest/youtube-dl -O "$R"/usr/local/bin/youtube-dl
 chmod a+rx "$R"/usr/local/bin/youtube-dl
