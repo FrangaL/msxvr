@@ -284,6 +284,10 @@ if [ "$(id -u)" -eq 0 ]; then
 fi
 EOF
 
+# Disable suspend/resume - speeds up boot massively
+mkdir -p "${R}/etc/initramfs-tools/conf.d/"
+echo "RESUME=none" > "${R}/etc/initramfs-tools/conf.d/resume"
+
 status "Instalando kernel ..."
 systemd-nspawn_exec apt-get update
 # shellcheck disable=SC2086
