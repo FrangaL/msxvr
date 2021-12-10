@@ -374,6 +374,9 @@ if [ -z "$LANG" ]; then
 fi
 EOM
 
+# This needs to be done or wireless doesnt work correctly on the RPi 3B+
+sed -i -e 's/REGDOM.*/REGDOMAIN=00/g' "$R"/etc/default/crda
+
 # # Habilitar SWAP
 # echo 'vm.swappiness=25' >>"$R"/etc/sysctl.conf
 # echo 'vm.vfs_cache_pressure=50' >>"$R"/etc/sysctl.conf
