@@ -54,7 +54,7 @@ if [ -e "$BASEDIR" ]; then
   echo "El directorio $BASEDIR existe, no se continuara"
   exit 1
 elif [[ $BASEDIR =~ [[:space:]] ]]; then
-  echo "El directorio \"$BASEDIR\" contiene espacios en blanco. No soportado."
+  echo "El directorio "\"$BASEDIR"\" contiene espacios en blanco. No soportado."
   exit 1
 fi
 
