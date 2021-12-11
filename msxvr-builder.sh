@@ -46,22 +46,19 @@ BASEDIR="${CURRENT_DIR}/${OS}_${RELEASE}_${VARIANT}_${ARCHITECTURE}"
 R="${BASEDIR}/build"
 
 # Detectar privilegios
-if [[ $EUID -ne 0 ]]; then
-  echo "Usar: sudo $0" 1>&2
-  exit 1
-fi
-
+[ $EUID -ne 0 ] && echo "Usar: sudo $0" 1>&2 && exit 1
+# Auto clean.
+[ $CLEAN -ge 1 ] && rm -rf "$BASEDIR"
 # Detecta antigua instalación
 if [ -e "$BASEDIR" ]; then
   echo "El directorio $BASEDIR existe, no se continuara"
   exit 1
 elif [[ $BASEDIR =~ [[:space:]] ]]; then
-  # shellcheck disable=SC2086
-  echo "El directorio "\"$BASEDIR"\" contiene espacios en blanco. No soportado."
+  echo "El directorio \"$BASEDIR\" contiene espacios en blanco. No soportado."
   exit 1
-else
-  mkdir -p "$R"
 fi
+
+mkdir -p "$R"
 
 # Show progress
 status() {
