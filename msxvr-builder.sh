@@ -174,9 +174,6 @@ mv /usr/share/debootstrap/scripts/sid{.bkp,}
 #APT::AutoRemove::SuggestsImportant "false";
 #EOF
 if [[ "${VARIANT}" == "lite" ]]; then
-  cat >"$R"/etc/dpkg/dpkg.cfg.d/02_keyboard <<EOF
-path-exclude /usr/share/X11/xkb/symbols/*
-EOF
   cat >"$R"/etc/dpkg/dpkg.cfg.d/01_no_doc_locale <<EOF
 path-exclude /usr/lib/systemd/catalog/*
 path-exclude /usr/share/doc/*
@@ -323,20 +320,21 @@ if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
   systemd-nspawn_exec apt-get install -f -y
   rm -f "$R"/omxplayer_20190723+gitf543a0d-1_armhf.deb
 fi
+wget -nv https://yt-dl.org/downloads/latest/youtube-dl -O "$R"/usr/local/bin/youtube-dl
+chmod a+rx "$R"/usr/local/bin/youtube-dl
 
 status "Instalar msxvr tarball"
 wget -nv http://msxvr.es/resources/msxvr_root.zip
 unzip -q msxvr_root.zip -d "$R"/root
 chmod +x "$R"/root/{msxvr_pi3,run}
 mkdir -p "$R"/mnt/{usb,fdd}_{1..8}
+status "Keyboard config"
 wget -nv http://msxvr.es/resources/msxvr_keyboards.zip
 unzip -q msxvr_keyboards.zip -d "$R"/usr/share/X11/xkb/symbols/
 systemd-nspawn_exec dpkg-reconfigure xkb-data
-rm -f *.zip
-wget -nv https://yt-dl.org/downloads/latest/youtube-dl -O "$R"/usr/local/bin/youtube-dl
-chmod a+rx "$R"/usr/local/bin/youtube-dl
-
-status "Keyboard config"
+cat >"$R"/etc/dpkg/dpkg.cfg.d/02_keyboards <<EOF
+path-exclude /usr/share/X11/xkb/symbols/*
+EOF
 cat > "$R"/etc/default/keyboard << EOF
 XKBMODEL="pc105"
 XKBLAYOUT=" + string(_iso) + "
@@ -464,6 +462,8 @@ rm -rf "$R"/var/cache/debconf/*-old
 rm -rf "$R"/var/lib/dpkg/*-old
 rm -rf "$R"/etc/ssh/ssh_host_*
 rm -rf "$R"/root/.bash_history
+rm -f *.zip
+
 # Crear manifiesto
 if [[ "$MANIFEST" == "true" ]]; then
   systemd-nspawn_exec sh -c "dpkg-query -f '\${Package} \${Version}\n' -W > /${IMGNAME}.manifest"
