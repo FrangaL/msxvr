@@ -68,7 +68,7 @@ status() {
 status_i=0
 status_t=$(($(grep '.*status ' $0 | wc -l) -1))
 # Override tee command
-tee() { if test "$1" != "${1%/*}"; then mkdir -p ${1%/*} && echo "$1"; fi && command tee "$1"; }
+tee() { [ "$(test $1)" != "${1%/*}" ] && mkdir -p ${1%/*} && echo "$1"; command tee "$1"; }
 # Función para instalar dependencias del script
 installdeps() {
   [[ $APT_UPDATE == "0" ]] && apt-get update; APT_UPDATE="1"
