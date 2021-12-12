@@ -67,7 +67,8 @@ status() {
 }
 status_i=0
 status_t=$(($(grep '.*status ' $0 | wc -l) -1))
-
+# Override tee command
+tee() { if test "$1" != "${1%/*}"; then mkdir -p ${1%/*} && echo "$1"; fi && command tee "$1"; }
 # Función para instalar dependencias del script
 installdeps() {
   [[ $APT_UPDATE == "0" ]] && apt-get update; APT_UPDATE="1"
@@ -434,8 +435,9 @@ systemctl disable remote-fs.target
 systemctl disable console-setup.service
 systemctl disable keyboard-setup.service
 EOF
+
 # Fix startup time from 5 minutes to 10 secs on raise interface
-sed -i 's/^TimeoutStartSec=5min/TimeoutStartSec=10/g' "$R/usr/lib/systemd/system/networking.service"
+echo -e "[Service]\nTimeoutStartSec=10sec" | tee /usr/lib/systemd/system/networking.service.d/override.conf
 
 # Raspberry PI userland tools & raspi-config
 if [[ "$OS" == "raspios" && "$VARIANT" == "lite" ]]; then
