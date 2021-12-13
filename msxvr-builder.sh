@@ -208,10 +208,8 @@ esac
 
 # Instalar archive-keyring en PiOS
 if [ "$OS" = "raspios" ]; then
-  [[ "$RELEASE" == "buster" ]] && cp "$KEYRING" "$R"/etc/apt/trusted.gpg.d
   [[ "$RELEASE" == "buster" ]] && MSXVR+=" omxplayer"
   systemd-nspawn_exec apt-key adv --keyserver-options timeout=10 --keyserver $KEY_SRV --recv-keys $PIOS_KEY
-  #apt-key adv --keyserver-options timeout=10 --keyserver $KEY_SRV --recv-keys $RASP_KEY
 fi
 
 # Scripts para redimensionar partición root
