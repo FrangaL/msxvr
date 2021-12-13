@@ -8,7 +8,7 @@ was written for this script.
 DISCLAIMER
 
 # Debugging script
-[[ "$*" == *--debug* ]] && exec > >(tee -a -i "${0%.*}.log") 2>&1; set -x
+[[ "$*" == *--debug* ]] && exec > >(tee -a -i "${0%.*}.log") 2>&1 && set -x
 
 # Configuración básica
 OS=${OS:-"raspios"}
@@ -45,7 +45,7 @@ R="${BASEDIR}/build"
 # Detectar privilegios
 [ $EUID -ne 0 ] && echo "Usar: sudo $0" 1>&2 && exit 1
 # Auto clean.
-[ $CLEAN -ge 1 ] && rm -rf "$BASEDIR"
+[ $CLEAN -ne 1 ] && rm -rf "$BASEDIR"
 # Detecta antigua instalación
 if [ -e "$BASEDIR" ]; then
   echo "El directorio $BASEDIR existe, no se continuara"
@@ -310,12 +310,12 @@ status "Instalar paquetes extra"
 systemd-nspawn_exec sh -c "DEBIAN_FRONTEND=noninteractive apt-get install -y $INCLUDEPKGS"
 
 if [[ "$RELEASE" == "bullseye" && "$ARCHITECTURE" == "armhf" ]]; then
-  wget https://archive.raspberrypi.org/debian/pool/main/o/omxplayer/omxplayer_20190723+gitf543a0d-1_armhf.deb
-  cp omxplayer_20190723+gitf543a0d-1_armhf.deb "$R"/omxplayer_20190723+gitf543a0d-1_armhf.deb
+  wget -nv https://archive.raspberrypi.org/debian/pool/main/o/omxplayer/omxplayer_20190723+gitf543a0d-1+bullseye_armhf.deb
+  cp omxplayer_20190723+gitf543a0d-1+bullseye_armhf.deb "$R"/omxplayer_20190723+gitf543a0d-1+bullseye_armhf.deb
   systemd-nspawn_exec apt-get install -y libavcodec58 libavformat58 libavutil56 libswresample3
-  systemd-nspawn_exec dpkg -i /omxplayer_20190723+gitf543a0d-1_armhf.deb
+  systemd-nspawn_exec dpkg -i /omxplayer_20190723+gitf543a0d-1+bullseye_armhf.deb
   systemd-nspawn_exec apt-get install -f -y
-  rm -f "$R"/omxplayer_20190723+gitf543a0d-1_armhf.deb
+  rm -f "$R"/omxplayer_20190723+gitf543a0d-1+bullseye_armhf.deb
 fi
 wget -nv https://yt-dl.org/downloads/latest/youtube-dl -O "$R"/usr/local/bin/youtube-dl
 chmod a+rx "$R"/usr/local/bin/youtube-dl
