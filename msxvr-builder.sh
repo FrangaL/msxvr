@@ -44,8 +44,7 @@ R="${BASEDIR}/build"
 
 # Detectar privilegios
 [ $EUID -ne 0 ] && echo "Usar: sudo $0" 1>&2 && exit 1
-# Auto clean.
-[ $CLEAN -ne 1 ] && rm -rf "$BASEDIR"
+
 # Detecta antigua instalación
 if [ -e "$BASEDIR" ]; then
   echo "El directorio $BASEDIR existe, no se continuara"
@@ -89,12 +88,10 @@ fi
 case ${ARCHITECTURE} in
   arm64)
     QEMUARCH="qemu-aarch64"
-    QEMUBIN="/usr/bin/qemu-aarch64-static"
-    ;;
+    QEMUBIN="/usr/bin/qemu-aarch64-static" ;;
   armhf)
     QEMUARCH="qemu-arm"
-    QEMUBIN="/usr/bin/qemu-arm-static"
-    ;;
+    QEMUBIN="/usr/bin/qemu-arm-static" ;;
 esac
 
 # Detectar modulo binfmt_misc cargado en el kernel
@@ -165,12 +162,6 @@ debootstrap --foreign --arch="${ARCHITECTURE}" --components="${COMPONENTS// /,}"
   --keyring=$KEYRING --exclude="info,install-info" --include="${MINPKGS// /,}" "$RELEASE" "$R" $BOOTSTRAP_URL
 mv /usr/share/debootstrap/scripts/sid{.bkp,}
 
-
-#cat >"$R"/etc/apt/apt.conf.d/99_norecommends <<EOF
-#APT::Install-Recommends "false";
-#APT::AutoRemove::RecommendsImportant "false";
-#APT::AutoRemove::SuggestsImportant "false";
-#EOF
 if [[ "${VARIANT}" == "lite" ]]; then
   cat >"$R"/etc/dpkg/dpkg.cfg.d/01_no_doc_locale <<EOF
 path-exclude /usr/lib/systemd/catalog/*
@@ -367,12 +358,6 @@ EOM
 # This needs to be done or wireless doesnt work correctly on the RPi 3B+
 sed -i -e 's/REGDOM.*/REGDOMAIN=00/g' "$R"/etc/default/crda
 
-# # Habilitar SWAP
-# echo 'vm.swappiness=25' >>"$R"/etc/sysctl.conf
-# echo 'vm.vfs_cache_pressure=50' >>"$R"/etc/sysctl.conf
-# systemd-nspawn_exec apt-get install -y dphys-swapfile >/dev/null 2>&1
-# sed -i "s/#CONF_SWAPSIZE=/CONF_SWAPSIZE=256/g" "$R"/etc/dphys-swapfile
-
 # Instalar f2fs-tools y modificar cmdline.txt
 if [ "$FSTYPE" = "f2fs" ]; then
   DEPS="f2fs-tools" installdeps
@@ -505,9 +490,9 @@ status "Rsyncing rootfs en archivo de imagen"
 rsync -aHAXx --exclude boot "${R}/" "${MOUNTDIR}/"
 rsync -rtx "${R}/boot" "${MOUNTDIR}/"
 
-# Desmontar sistema de archivos y eliminar compilación
-umount "$MOUNTDIR/$BOOT"
-umount "$MOUNTDIR"
+status "Desmontar sistema de archivos y eliminar compilación"
+umount -v "$MOUNTDIR/$BOOT"
+umount -v "$MOUNTDIR"
 rm -rf "$BASEDIR"
 
 status "Chequear particiones"
