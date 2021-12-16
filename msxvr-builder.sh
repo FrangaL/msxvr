@@ -67,6 +67,7 @@ status_t=$(($(grep '.*status ' $0 | wc -l) -1))
 tee() { [ "$(test $1)" != "${1%/*}" ] && mkdir -p ${1%/*} && echo "$1"; command tee "$1"; }
 # Función para instalar dependencias del script
 installdeps() {
+  APT_UPDATE="$APT_UPDATE:-0"
   [[ $APT_UPDATE == "0" ]] && apt-get update; APT_UPDATE="1"
   apt-get -q -y install --no-install-recommends -o APT::Install-Suggests=0 \
       -o dpkg::options::=--force-confnew -o Acquire::Retries=3 $DEPS
